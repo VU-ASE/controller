@@ -1,16 +1,36 @@
 # Service definition
-name: ChangeThisRepoName
-description: template-GoModule
+name: controller
+description: the authority on all steering decisions
 
 # No dependencies
-dependencies: []
+dependencies: 
+  - service: imaging
+    output: path
 
 # No outputs (You'll probably want to update this or `dependencies`)
-outputs: []
+outputs:
+  - name: decision
+    address: tcp://localhost:9791
 
 # Runtime options
 options:
-  - name: example_option
-    type: int     # Can be int, float, string, bool
-    mutable: true # Can be changed at runtime
-    default: 1    # Default value
+  - name: speed
+    type: float
+    mutable: true
+    default: 0.2
+  - name: kp
+    type: float
+    mutable: true
+    default: 0.01
+  - name: kd
+    type: float
+    mutable: true
+    default: 0
+  - name: ki
+    type: float
+    mutable: true
+    default: 0
+  - name: desired-trajectory-point
+    type: int
+    mutable: false
+    default: 320 # 640 / 2
