@@ -4,9 +4,9 @@ import (
 	"os"
 	"time"
 
-	pb_outputs "github.com/VU-ASE/pkg-CommunicationDefinitions/v2/packages/go/outputs"
-	pb_systemmanager_messages "github.com/VU-ASE/pkg-CommunicationDefinitions/v2/packages/go/systemmanager"
-	servicerunner "github.com/VU-ASE/pkg-ServiceRunner/v2/src"
+	pb_outputs "github.com/VU-ASE/rovercom/packages/go/outputs"
+	pb_core_messages "github.com/VU-ASE/rovercom/packages/go/core"
+	roverlib "github.com/VU-ASE/roverlib/src"
 	zmq "github.com/pebbe/zmq4"
 	"github.com/rs/zerolog/log"
 	pid "go.einride.tech/pid"
@@ -18,9 +18,9 @@ var pidController pid.Controller
 var speed float32
 
 func run(
-	service servicerunner.ResolvedService,
-	sysMan servicerunner.SystemManagerInfo,
-	initialTuning *pb_systemmanager_messages.TuningState) error {
+	service roverlib.ResolvedService,
+	sysMan roverlib.SystemManagerInfo,
+	initialTuning *pb_core_messages.TuningState) error {
 
 	// Get the address of trajectory data output by the imaging module
 	imagingTrajectoryAddress, err := service.GetDependencyAddress("imaging", "path")
@@ -59,27 +59,27 @@ func run(
 	}
 
 	// Get PID tuning values
-	kp, err := servicerunner.GetTuningFloat("kp", initialTuning)
+	kp, err := roverlib.GetTuningFloat("kp", initialTuning)
 	if err != nil {
 		return err
 	}
-	ki, err := servicerunner.GetTuningFloat("ki", initialTuning)
+	ki, err := roverlib.GetTuningFloat("ki", initialTuning)
 	if err != nil {
 		return err
 	}
-	kd, err := servicerunner.GetTuningFloat("kd", initialTuning)
+	kd, err := roverlib.GetTuningFloat("kd", initialTuning)
 	if err != nil {
 		return err
 	}
 
 	// Get speed to use
-	speed, err = servicerunner.GetTuningFloat("speed", initialTuning)
+	speed, err = roverlib.GetTuningFloat("speed", initialTuning)
 	if err != nil {
 		return err
 	}
 
 	// Get the desired trajectory point
-	desiredTrajectoryPoint, err := servicerunner.GetTuningInt("desired-trajectory-point", initialTuning)
+	desiredTrajectoryPoint, err := roverlib.GetTuningInt("desired-trajectory-point", initialTuning)
 	if err != nil {
 		return err
 	}
@@ -182,10 +182,10 @@ func run(
 	}
 }
 
-func onTuningState(newtuning *pb_systemmanager_messages.TuningState) {
+func onTuningState(newtuning *pb_core_messages.TuningState) {
 	log.Warn().Msg("Tuning state changed")
 	// Get speed to use
-	newSpeed, err := servicerunner.GetTuningFloat("speed", newtuning)
+	newSpeed, err := roverlib.GetTuningFloat("speed", newtuning)
 	if err != nil {
 		log.Err(err).Msg("Failed to get new speed")
 		return
@@ -193,17 +193,17 @@ func onTuningState(newtuning *pb_systemmanager_messages.TuningState) {
 	speed = newSpeed
 
 	// Create a new PID controller
-	kp, err := servicerunner.GetTuningFloat("kp", newtuning)
+	kp, err := roverlib.GetTuningFloat("kp", newtuning)
 	if err != nil {
 		log.Err(err).Msg("Failed to get new kp")
 		return
 	}
-	ki, err := servicerunner.GetTuningFloat("ki", newtuning)
+	ki, err := roverlib.GetTuningFloat("ki", newtuning)
 	if err != nil {
 		log.Err(err).Msg("Failed to get new ki")
 		return
 	}
-	kd, err := servicerunner.GetTuningFloat("kd", newtuning)
+	kd, err := roverlib.GetTuningFloat("kd", newtuning)
 	if err != nil {
 		log.Err(err).Msg("Failed to get new kd")
 		return
@@ -226,5 +226,5 @@ func onTerminate(sig os.Signal) {
 
 // Used to start the program with the correct arguments
 func main() {
-	servicerunner.Run(run, onTuningState, onTerminate, false)
+	roverlib.Run(run, onTuningState, onTerminate, false)
 }
