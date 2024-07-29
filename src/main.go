@@ -19,7 +19,7 @@ var speed float32
 
 func run(
 	service roverlib.ResolvedService,
-	sysMan roverlib.SystemManagerInfo,
+	sysMan roverlib.CoreInfo,
 	initialTuning *pb_core_messages.TuningState) error {
 
 	// Get the address of trajectory data output by the imaging module
