@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/VU-ASE/controller/compare/v1.0.1...v1.1.0) (2024-12-10)
+
+
+### Features
+
+* compliant with roverlib-go 1.1.7 ([0c1aa13](https://github.com/VU-ASE/controller/commit/0c1aa132263989cd73ea241a7ccb4970b8f550e9))
+
+
+### Bug Fixes
+
+* rename CoreInfo ([63afc17](https://github.com/VU-ASE/controller/commit/63afc175b3f4d10ff84ec794c00b2544ff7963ee))
+
 ## [1.0.1](https://github.com/VU-ASE/controller/compare/v1.0.0...v1.0.1) (2024-07-26)
 
 
