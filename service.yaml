@@ -1,36 +1,40 @@
-# Service definition
 name: controller
+author: vu-ase
+source: https://github.com/vu-ase/controller
+version: 1.0.0
 description: the authority on all steering decisions
 
-# No dependencies
-dependencies: 
+commands:
+  build: make build 
+  run: ./bin/controller
+
+inputs:
   - service: imaging
-    output: path
+    streams:
+      - path
 
-# No outputs (You'll probably want to update this or `dependencies`)
 outputs:
-  - name: decision
-    address: tcp://localhost:9791
+  - decision
 
-# Runtime options
-options:
+
+configuration:
   - name: speed
     type: float
+    value: 1.0
     mutable: true
-    default: 0.2
   - name: kp
     type: float
+    value: 0.01
     mutable: true
-    default: 0.01
   - name: kd
     type: float
+    value: 0
     mutable: true
-    default: 0
   - name: ki
     type: float
+    value: 0
     mutable: true
-    default: 0
   - name: desired-trajectory-point
     type: int
+    value: 320 # 640 / 2
     mutable: false
-    default: 320 # 640 / 2

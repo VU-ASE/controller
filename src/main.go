@@ -1,85 +1,59 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"time"
 
 	pb_outputs "github.com/VU-ASE/rovercom/packages/go/outputs"
-	pb_core_messages "github.com/VU-ASE/rovercom/packages/go/core"
-	roverlib "github.com/VU-ASE/roverlib/src"
-	zmq "github.com/pebbe/zmq4"
+	roverlib "github.com/VU-ASE/roverlib-go/src"
 	"github.com/rs/zerolog/log"
 	pid "go.einride.tech/pid"
-	"google.golang.org/protobuf/proto"
 )
 
 // Global values for OTA tuning
 var pidController pid.Controller
-var speed float32
+var speed float64
 
 func run(
-	service roverlib.ResolvedService,
-	sysMan roverlib.CoreInfo,
-	initialTuning *pb_core_messages.TuningState) error {
+	service roverlib.Service, config *roverlib.ServiceConfiguration) error {
 
-	// Get the address of trajectory data output by the imaging module
-	imagingTrajectoryAddress, err := service.GetDependencyAddress("imaging", "path")
-	if err != nil {
-		return err
-	}
+	//
+	// Set up stream to read track from
+	//
+	imagingInput := service.GetReadStream("imaging", "path")
 
-	// Get the address to which to send the decision data for the actuator to use
-	decisionAddress, err := service.GetOutputAddress("decision")
-	if err != nil {
-		return err
-	}
+	//
+	// Set up stream to write actuator data to
+	//
+	actuatorOutput := service.GetWriteStream("decision")
 
-	// Create a socket to send decision data on
-	outputSock, err := zmq.NewSocket(zmq.PUB)
-	if err != nil {
-		return err
-	}
-	err = outputSock.Bind(decisionAddress)
-	if err != nil {
-		return err
-	}
+	//
+	// Get configuration values
+	//
 
-	// Create a socket to receive trajectory data on
-	imagingSock, err := zmq.NewSocket(zmq.SUB)
-	if err != nil {
-		return err
-	}
-	err = imagingSock.Connect(imagingTrajectoryAddress)
-	if err != nil {
-		return err
-	}
-	err = imagingSock.SetSubscribe("") // Subscribe to all messages
-	if err != nil {
-		return err
+	if config == nil {
+		return fmt.Errorf("No configuration provided")
 	}
 
 	// Get PID tuning values
-	kp, err := roverlib.GetTuningFloat("kp", initialTuning)
+	kp, err := config.GetFloatSafe("kp")
 	if err != nil {
 		return err
 	}
-	ki, err := roverlib.GetTuningFloat("ki", initialTuning)
+	ki, err := config.GetFloatSafe("ki")
 	if err != nil {
 		return err
 	}
-	kd, err := roverlib.GetTuningFloat("kd", initialTuning)
+	kd, err := config.GetFloatSafe("kd")
 	if err != nil {
 		return err
 	}
-
-	// Get speed to use
-	speed, err = roverlib.GetTuningFloat("speed", initialTuning)
+	speed, err = config.GetFloatSafe("speed")
 	if err != nil {
 		return err
 	}
-
-	// Get the desired trajectory point
-	desiredTrajectoryPoint, err := roverlib.GetTuningInt("desired-trajectory-point", initialTuning)
+	desiredTrajectoryPoint, err := config.GetIntSafe("desired-trajectory-point")
 	if err != nil {
 		return err
 	}
@@ -95,24 +69,14 @@ func run(
 
 	// Main loop, subscribe to trajectory data and send decision data
 	for {
-		// Receive trajectory data
-		sensorBytes, err := imagingSock.RecvBytes(0)
+		log.Debug().Msg("looping")
+		data, err := imagingInput.Read()
 		if err != nil {
 			return err
 		}
 
-		log.Debug().Msg("Received imaging data")
-
-		// Parse as protobuf message
-		sensorOutput := &pb_outputs.SensorOutput{}
-		err = proto.Unmarshal(sensorBytes, sensorOutput)
-		if err != nil {
-			log.Err(err).Msg("Failed to unmarshal trajectory data")
-			continue
-		}
-
 		// Parse imaging data
-		imagingData := sensorOutput.GetCameraOutput()
+		imagingData := data.GetCameraOutput()
 		if imagingData == nil {
 			log.Warn().Msg("Received sensor data that was not camera data")
 			continue
@@ -131,8 +95,8 @@ func run(
 			log.Warn().Msg("Received sensor data that had no trajectory points")
 			continue
 		}
-		firstPoint := trajectoryPoints[0]
 		// This is the middle of the longest consecutive slice, it should be in the middle of the image (horizontally)
+		firstPoint := trajectoryPoints[0]
 
 		// Use the PID controller to decide where to go
 		pidController.Update(pid.ControllerInput{
@@ -150,29 +114,21 @@ func run(
 		}
 		steerValue = -steerValue
 
-		// Create controller output, wrapped in generic sensor output
-		controllerOutput := &pb_outputs.SensorOutput{
-			SensorId:  1,
-			Timestamp: uint64(time.Now().UnixMilli()),
-			SensorOutput: &pb_outputs.SensorOutput_ControllerOutput{
-				ControllerOutput: &pb_outputs.ControllerOutput{
-					SteeringAngle: float32(steerValue),
-					LeftThrottle:  speed,
-					RightThrottle: speed,
-					FrontLights:   false,
+		err = actuatorOutput.Write(
+			&pb_outputs.SensorOutput{
+				SensorId:  2,
+				Timestamp: uint64(time.Now().UnixMilli()),
+				SensorOutput: &pb_outputs.SensorOutput_ControllerOutput{
+					ControllerOutput: &pb_outputs.ControllerOutput{
+						SteeringAngle: float32(steerValue),
+						LeftThrottle:  float32(speed),
+						RightThrottle: float32(speed),
+						FrontLights:   false,
+					},
 				},
 			},
-		}
-
-		// Marshal the controller output
-		controllerBytes, err := proto.Marshal(controllerOutput)
-		if err != nil {
-			log.Err(err).Msg("Failed to marshal controller output")
-			continue
-		}
-
+		)
 		// Send it for the actuator (and others) to use
-		_, err = outputSock.SendBytes(controllerBytes, 0)
 		if err != nil {
 			log.Err(err).Msg("Failed to send controller output")
 			continue
@@ -182,49 +138,11 @@ func run(
 	}
 }
 
-func onTuningState(newtuning *pb_core_messages.TuningState) {
-	log.Warn().Msg("Tuning state changed")
-	// Get speed to use
-	newSpeed, err := roverlib.GetTuningFloat("speed", newtuning)
-	if err != nil {
-		log.Err(err).Msg("Failed to get new speed")
-		return
-	}
-	speed = newSpeed
-
-	// Create a new PID controller
-	kp, err := roverlib.GetTuningFloat("kp", newtuning)
-	if err != nil {
-		log.Err(err).Msg("Failed to get new kp")
-		return
-	}
-	ki, err := roverlib.GetTuningFloat("ki", newtuning)
-	if err != nil {
-		log.Err(err).Msg("Failed to get new ki")
-		return
-	}
-	kd, err := roverlib.GetTuningFloat("kd", newtuning)
-	if err != nil {
-		log.Err(err).Msg("Failed to get new kd")
-		return
-	}
-
-	// Initialize pid controller
-	pidController = pid.Controller{
-		Config: pid.ControllerConfig{
-			ProportionalGain: float64(kp),
-			IntegralGain:     float64(ki),
-			DerivativeGain:   float64(kd),
-		},
-	}
-
-}
-
-func onTerminate(sig os.Signal) {
-	log.Info().Msg("Terminating")
+func onTerminate(sig os.Signal) error {
+	return nil
 }
 
 // Used to start the program with the correct arguments
 func main() {
-	roverlib.Run(run, onTuningState, onTerminate, false)
+	roverlib.Run(run, onTerminate)
 }
