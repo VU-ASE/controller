@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/VU-ASE/controller/compare/v1.1.0...v1.2.0) (2024-12-11)
+
+
+### Features
+
+* fix service yaml ([761a363](https://github.com/VU-ASE/controller/commit/761a3631d376d0cf444373774a7c050c431d32d5))
+
 ## [1.1.0](https://github.com/VU-ASE/controller/compare/v1.0.1...v1.1.0) (2024-12-10)
 
 
