@@ -5,7 +5,7 @@ version: 1.0.0
 description: the authority on all steering decisions
 
 commands:
-  build: make build 
+  build: make build
   run: ./bin/controller
 
 inputs:
@@ -16,25 +16,24 @@ inputs:
 outputs:
   - decision
 
-
 configuration:
   - name: speed
     type: float
-    value: 1.0
-    mutable: true
+    tunable: true
+    value: 0.2
   - name: kp
     type: float
+    tunable: true
     value: 0.01
-    mutable: true
   - name: kd
     type: float
+    tunable: true
     value: 0
-    mutable: true
   - name: ki
     type: float
+    tunable: true
     value: 0
-    mutable: true
   - name: desired-trajectory-point
-    type: int
+    type: float
+    tunable: false
     value: 320 # 640 / 2
-    mutable: false
