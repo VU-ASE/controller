@@ -90,6 +90,30 @@ func run(
 			continue
 		}
 
+		speed, err = config.GetFloat("speed")
+		if err != nil {
+			log.Warn().Err(err).Msg("Failed to get speed from config")
+		}
+
+		newKp, perr := config.GetFloat("kp")
+		newKd, derr := config.GetFloat("kd")
+		newKi, ierr := config.GetFloat("ki")
+		if perr == nil && derr == nil && ierr == nil && (newKp != kp || newKd != kd || newKi != ki) {
+			kp = newKp
+			kd = newKd
+
+			// Create a new PID controller with the new values
+			pidController = pid.Controller{
+				Config: pid.ControllerConfig{
+					ProportionalGain: float64(kp),
+					IntegralGain:     float64(ki),
+					DerivativeGain:   float64(kd),
+				},
+			}
+
+			log.Info().Float64("kp", kp).Float64("kd", kd).Float64("ki", ki).Msg("Updated PID controller")
+		}
+
 		// Get the first trajectory point
 		trajectoryPoints := trajectory.GetPoints()
 		if len(trajectoryPoints) == 0 {

@@ -3,7 +3,7 @@ module vu/ase/controller
 go 1.22.0
 
 require (
-	github.com/VU-ASE/roverlib-go v1.2.0
+	github.com/VU-ASE/roverlib-go v1.2.6
 	github.com/pebbe/zmq4 v1.2.11
 	github.com/rs/zerolog v1.33.0
 	go.einride.tech/pid v0.1.2
