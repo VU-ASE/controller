@@ -39,4 +39,3 @@ configuration:
     tunable: false
     type: number
     value: 320 # 640 / 2
-    mutable: false
