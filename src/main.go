@@ -53,10 +53,11 @@ func run(
 	if err != nil {
 		return err
 	}
-	desiredTrajectoryPoint, err := config.GetIntSafe("desired-trajectory-point")
+	desiredTrajectoryPointFloat, err := config.GetFloatSafe("desired-trajectory-point")
 	if err != nil {
 		return err
 	}
+	desiredTrajectoryPoint := int(desiredTrajectoryPointFloat)
 
 	// Initialize pid controller
 	pidController = pid.Controller{
