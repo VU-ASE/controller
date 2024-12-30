@@ -8,6 +8,7 @@ commands:
   build: make build 
   run: ./bin/controller
 
+
 inputs:
   - service: imaging
     streams:
@@ -16,25 +17,24 @@ inputs:
 outputs:
   - decision
 
-
 configuration:
   - name: speed
-    type: float
+    type: number
     value: 1.0
     mutable: true
   - name: kp
-    type: float
+    type: number
     value: 0.01
     mutable: true
   - name: kd
-    type: float
+    type: number
     value: 0
     mutable: true
   - name: ki
-    type: float
+    type: number
     value: 0
     mutable: true
   - name: desired-trajectory-point
-    type: int
+    type: number
     value: 320 # 640 / 2
     mutable: false
