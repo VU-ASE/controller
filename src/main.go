@@ -101,6 +101,7 @@ func run(
 		if perr == nil && derr == nil && ierr == nil && (newKp != kp || newKd != kd || newKi != ki) {
 			kp = newKp
 			kd = newKd
+			ki = newKi
 
 			// Create a new PID controller with the new values
 			pidController = pid.Controller{
