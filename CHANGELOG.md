@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.0](https://github.com/VU-ASE/controller/compare/v1.2.0...v1.3.0) (2024-12-31)
+
+
+### Features
+
+* enable tuning support ([b13f9ef](https://github.com/VU-ASE/controller/commit/b13f9ef011491d3ab792ffdac27c57ceddebf0ab))
+* fully working on the Rover ([bdc7f76](https://github.com/VU-ASE/controller/commit/bdc7f76ecdd355227c97f7b783672b8f0c569039))
+* support PID tuning ([a768454](https://github.com/VU-ASE/controller/commit/a7684542468083673b417bf6653b58dd43529289))
+
 ## [1.2.0](https://github.com/VU-ASE/controller/compare/v1.1.0...v1.2.0) (2024-12-11)
 
 
