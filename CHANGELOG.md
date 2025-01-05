@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/VU-ASE/controller/compare/v1.3.0...v1.3.1) (2025-01-05)
+
+
+### Bug Fixes
+
+* build without linting ([9524600](https://github.com/VU-ASE/controller/commit/952460011a0f40a92e27813d57567e5e48837833))
+
 ## [1.3.0](https://github.com/VU-ASE/controller/compare/v1.2.0...v1.3.0) (2024-12-31)
 
 
