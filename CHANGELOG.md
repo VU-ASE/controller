@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/VU-ASE/controller/compare/v1.3.1...v1.4.0) (2025-01-05)
+
+
+### Features
+
+* added Devcontainers ([b78e4f4](https://github.com/VU-ASE/controller/commit/b78e4f41edfac14b21706df6be62353afa099985))
+
 ## [1.3.1](https://github.com/VU-ASE/controller/compare/v1.3.0...v1.3.1) (2025-01-05)
 
 
