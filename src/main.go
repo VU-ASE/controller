@@ -23,6 +23,11 @@ func run(
 	//
 	imagingInput := service.GetReadStream("imaging", "path")
 
+	// 
+	// Set up stream to read distance
+	// 
+	distanceInput := service.GetReadStream("distance", "distance-m")
+
 	//
 	// Set up stream to write actuator data to
 	//
@@ -71,7 +76,41 @@ func run(
 	// Main loop, subscribe to trajectory data and send decision data
 	for {
 		log.Debug().Msg("looping")
-		data, err := imagingInput.Read()
+
+
+		data, err := distanceInput.Read()
+		if err != nil {
+			return err
+		}
+
+		distanceMeters := data.GetDistanceOutput().GetDistance()
+
+		log.Info().Float32("fucking distance", distanceMeters).Msg("ffs")
+
+		if distanceMeters <= 0.25 {
+			err = actuatorOutput.Write(
+				&pb_outputs.SensorOutput{
+					SensorId:  2,
+					Timestamp: uint64(time.Now().UnixMilli()),
+					SensorOutput: &pb_outputs.SensorOutput_ControllerOutput{
+						ControllerOutput: &pb_outputs.ControllerOutput{
+							SteeringAngle: float32(0),
+							LeftThrottle:  float32(0),
+							RightThrottle: float32(0),
+							FrontLights:   false,
+						},
+					},
+				},
+			)
+			// Send it for the actuator (and others) to use
+			if err != nil {
+				log.Err(err).Msg("Failed to send controller output")
+			}
+			continue
+		}
+
+
+		data, err = imagingInput.Read()
 		if err != nil {
 			return err
 		}

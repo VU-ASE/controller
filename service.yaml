@@ -1,7 +1,7 @@
 name: controller
 author: vu-ase
 source: https://github.com/vu-ase/controller
-version: 1.0.0
+version: 2.0.0
 description: the authority on all steering decisions
 
 commands:
@@ -13,6 +13,9 @@ inputs:
   - service: imaging
     streams:
       - path
+  - service: distance
+    streams:
+      - distance-m
 
 outputs:
   - decision
