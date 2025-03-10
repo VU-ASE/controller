@@ -53,7 +53,7 @@ Next, we further process the input to extract a `CameraSensorOutput_Trajectory` 
 
 The first point in the array of trajectory points is the identified middle of the visible part of the track. (see image below). You can, for example, compare value of its `x` coordinate to the middle of the frame to see if the car is offset towards the left or right side of the track.
 
-![alt text](blob_with_line.png)
+![blob_with_line](https://github.com/user-attachments/assets/6422e01d-f1f1-4e45-9493-b642b90b4adc)
 
 ## Controller
 
