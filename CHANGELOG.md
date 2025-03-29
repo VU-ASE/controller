@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/VU-ASE/controller/compare/v1.4.0...v1.4.1) (2025-03-29)
+
+
+### Bug Fixes
+
+* updated rovercom and roverlib ([3c6c698](https://github.com/VU-ASE/controller/commit/3c6c698cb12970a33b1ffe50aec29530365d5bc7))
+
 ## [1.4.0](https://github.com/VU-ASE/controller/compare/v1.3.1...v1.4.0) (2025-01-05)
 
 
