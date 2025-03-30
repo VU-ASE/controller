@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/VU-ASE/controller/compare/v1.4.1...v1.4.2) (2025-03-30)
+
+
+### Bug Fixes
+
+* make PID controller tunable ([b907c58](https://github.com/VU-ASE/controller/commit/b907c58c90cd6df8c3ced6dd42ce8e13770b5402))
+
 ## [1.4.1](https://github.com/VU-ASE/controller/compare/v1.4.0...v1.4.1) (2025-03-29)
 
 
