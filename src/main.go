@@ -15,6 +15,11 @@ import (
 var pidController pid.Controller
 var speed float64
 
+// Compare float values for equality
+func floatEqual(a, b float64) bool {
+	return a-b < 0.0001 && b-a < 0.0001
+}
+
 func run(
 	service roverlib.Service, config *roverlib.ServiceConfiguration) error {
 
@@ -98,7 +103,7 @@ func run(
 		newKp, perr := config.GetFloat("kp")
 		newKd, derr := config.GetFloat("kd")
 		newKi, ierr := config.GetFloat("ki")
-		if perr == nil && derr == nil && ierr == nil && (newKp != kp || newKd != kd || newKi != ki) {
+		if perr == nil && derr == nil && ierr == nil && (!floatEqual(newKp, kp) || !floatEqual(newKd, kd) || !floatEqual(newKi, ki)) {
 			kp = newKp
 			kd = newKd
 			ki = newKi
@@ -131,7 +136,6 @@ func run(
 			SamplingInterval: 100 * time.Millisecond,
 		})
 		steerValue := pidController.State.ControlSignal
-		log.Info().Float64("steerValue", steerValue).Int("Desired", desiredTrajectoryPoint).Float32("Actual", float32(firstPoint.X)).Msg("Calculated steering value")
 		// min-max
 		if steerValue > 1 {
 			steerValue = 1
