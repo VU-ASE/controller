@@ -27,8 +27,13 @@ pb_output.SensorOutput{
 
 `SensorOutput_CameraOutput` object contains a `CameraSensorOutput` object with 2 main fields:
 1. `CameraSensorOutput_DebugFrame` containing:
+<<<<<<< HEAD
     -  `Jpeg`, a (prerpocessed) acquired frame transmitted as a raw byte array of a JPEG image and the 
     - `canvas`, contains a `width` and `height` fields, as well as an array of `CanvasObject`s, which are either a `Line`, `Rectangle` or `Circle`. It can be used for example to overlay these shapes on top of the JPEG image. 
+=======
+    -  `Jpeg`, a (preprocessed) acquired frame transmitted as a raw byte array of a JPEG image
+    - `canvas`, which contains a `width` and `height` fields, as well as an array of `CanvasObject`s, which are either a `Line`, `Rectangle` or `Circle`. It can be used for example to overlay these shapes on top of the JPEG image. 
+>>>>>>> 8cb655f (chore: fix typos in the docs)
 
 2. `CameraSensorOutput_Trajecotry` is composed of:
     - `trajectory_points` array of points supplied by the imaging (default implementation only passes 1 point to the array). 
