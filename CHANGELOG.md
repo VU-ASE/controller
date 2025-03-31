@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.0](https://github.com/VU-ASE/controller/compare/v1.4.2...v1.5.0) (2025-03-31)
+
+
+### Features
+
+* smooth steering (lower kp) ([a7bbdc5](https://github.com/VU-ASE/controller/commit/a7bbdc5cb7cacca94cb7ebfdc60d581456894269))
+
 ## [1.4.2](https://github.com/VU-ASE/controller/compare/v1.4.1...v1.4.2) (2025-03-30)
 
 
