@@ -3,15 +3,9 @@ package main
 import (
 	"testing"
 	"fmt"
-	// roverlib "github.com/VU-ASE/roverlib-go/src"
 	pb_outputs "github.com/VU-ASE/rovercom/packages/go/outputs"
 )
 
-// func TestInitializePIDController(t *testing.T) {
-// 	kp := 0.003
-// 	kd := 0.00001
-// 	ki := 0
-// }
 
 func TestCalculateSteerValue(t *testing.T) {
 	kp := 0.003
