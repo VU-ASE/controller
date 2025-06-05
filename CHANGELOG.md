@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/VU-ASE/controller/compare/v1.5.0...v1.6.0) (2025-06-05)
+
+
+### Features
+
+* add unit tests for calculating steer value ([76e3346](https://github.com/VU-ASE/controller/commit/76e33468fc2da50fe43b516fd6ef0559a126c020))
+
 ## [1.5.0](https://github.com/VU-ASE/controller/compare/v1.4.2...v1.5.0) (2025-03-31)
 
 
