@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.6.0](https://github.com/VU-ASE/controller/compare/v1.5.0...v1.6.0) (2025-06-11)
+
+
+### Features
+
+* add unit tests for calculating steer value ([76e3346](https://github.com/VU-ASE/controller/commit/76e33468fc2da50fe43b516fd6ef0559a126c020))
+* added a PR event trigger for the build action ([edda583](https://github.com/VU-ASE/controller/commit/edda5839312049b50ac1e364ed620d54a01edbbc))
+
+
+### Bug Fixes
+
+* release-please PR always "expected" ([467672d](https://github.com/VU-ASE/controller/commit/467672d5fc9f827fee9da86fa19d0030365d8162))
+
 ## [1.5.0](https://github.com/VU-ASE/controller/compare/v1.4.2...v1.5.0) (2025-03-31)
 
 
