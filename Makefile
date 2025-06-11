@@ -28,4 +28,4 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 test: lint
-	go test ./src -v -count=1 -timeout 0
+	go test ./src -v -count=1 -timeout 0 
