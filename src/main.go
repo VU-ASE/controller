@@ -31,14 +31,14 @@ func initializePIDController(kp, ki, kd float64) pid.Controller {
 	return result
 }
 
-func calculateSteerValue(pidController pid.Controller, trajectoryPoints []*pb_outputs.CameraSensorOutput_Trajectory_Point, desiredTrajectoryPoint int) float64 {
+func calculateSteerValue(pidController pid.Controller, trajectoryPoints []*pb_outputs.CameraSensorOutput_Trajectory_Point, desiredTrajectoryPoint float64) float64 {
 	// This is the middle of the longest consecutive slice, it should be in the middle of the image (horizontally)
 	firstPoint := trajectoryPoints[0]
 
 	// Use the PID controller to decide where to go
 	pidController.Update(pid.ControllerInput{
-		ReferenceSignal:  float64(desiredTrajectoryPoint),
-		ActualSignal:     float64(firstPoint.X),
+		ReferenceSignal:  desiredTrajectoryPoint,
+		ActualSignal:     float64(firstPoint.X) / 1000.0,
 		SamplingInterval: 100 * time.Millisecond,
 	})
 	steerValue := pidController.State.ControlSignal
@@ -162,7 +162,7 @@ func run(
 			continue
 		}
 
-		steerValue := calculateSteerValue(pidController, trajectoryPoints, desiredTrajectoryPoint)
+		steerValue := calculateSteerValue(pidController, trajectoryPoints, float64(desiredTrajectoryPoint))
 
 		err = sendOutput(actuatorOutput, speed, steerValue)
 

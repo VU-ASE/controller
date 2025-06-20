@@ -86,7 +86,7 @@ func TestCalculateSteerValue(t *testing.T) {
 
 		testname := fmt.Sprintf("actual X: %d, desired X: %d", tt.trajectoryPoints[0].X, desiredPoint)
 		t.Run(testname, func(t *testing.T) {
-			have := calculateSteerValue(controller, tt.trajectoryPoints, desiredPoint)
+			have := calculateSteerValue(controller, tt.trajectoryPoints, float64(desiredPoint))
 			if tt.want != have {
 				t.Errorf("calculateSteerValue() = %f, want: %f", have, tt.want)
 			}
