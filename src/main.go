@@ -5,10 +5,14 @@ import (
 	"os"
 	"time"
 
-	pb_outputs "github.com/VU-ASE/rovercom/packages/go/outputs"
-	roverlib "github.com/VU-ASE/roverlib-go/src"
+	pb_outputs "github.com/VU-ASE/rovercom/v2/packages/go/outputs"
+	roverlib "github.com/VU-ASE/roverlib-go/v2/src"
 	"github.com/rs/zerolog/log"
 	pid "go.einride.tech/pid"
+)
+
+const (
+	ERROR_SCALER = 100.0
 )
 
 // Global values for OTA tuning
@@ -31,15 +35,19 @@ func initializePIDController(kp, ki, kd float64) pid.Controller {
 	return result
 }
 
-func calculateSteerValue(pidController pid.Controller, trajectoryPoints []*pb_outputs.CameraSensorOutput_Trajectory_Point, desiredTrajectoryPoint int) float64 {
-	// This is the middle of the longest consecutive slice, it should be in the middle of the image (horizontally)
-	firstPoint := trajectoryPoints[0]
+func calculateSteerValue(pidController pid.Controller, trajectoryPoints []*pb_outputs.HorizontalScan, resolution *pb_outputs.Resolution) float64 {
+	// Ideally, the center of the horizontal scan, should be at the center of the image
+	desired := float64(resolution.GetWidth()) / 2.0
+	// This is the center of the horizontal scan
+	actual := float64(trajectoryPoints[0].XRight+trajectoryPoints[0].XLeft) / 2.0
 
 	// Use the PID controller to decide where to go
 	pidController.Update(pid.ControllerInput{
-		ReferenceSignal:  float64(desiredTrajectoryPoint),
-		ActualSignal:     float64(firstPoint.X),
-		SamplingInterval: 100 * time.Millisecond,
+		// We use the ERROR_SCALER so that the Kp, Ki and Kd values do not become too small
+		// (see the service.yaml file for the default values)
+		ReferenceSignal:  desired / ERROR_SCALER,
+		ActualSignal:     actual / ERROR_SCALER,
+		SamplingInterval: 10 * time.Second,
 	})
 	steerValue := pidController.State.ControlSignal
 	// min-max
@@ -107,11 +115,6 @@ func run(
 	if err != nil {
 		return err
 	}
-	desiredTrajectoryPointFloat, err := config.GetFloatSafe("desired-trajectory-point")
-	if err != nil {
-		return err
-	}
-	desiredTrajectoryPoint := int(desiredTrajectoryPointFloat)
 
 	pidController = initializePIDController(kp, ki, kd)
 
@@ -130,10 +133,10 @@ func run(
 			continue
 		}
 
-		// Get trajectory
-		trajectory := imagingData.GetTrajectory()
-		if trajectory == nil {
-			log.Warn().Msg("Received sensor data that was not trajectory data")
+		// Get the horizontal scan data
+		horizontal_scans := imagingData.GetHorizontalScans()
+		if horizontal_scans == nil {
+			log.Warn().Msg("Received sensor data that was not horizontal scan data")
 			continue
 		}
 
@@ -155,14 +158,18 @@ func run(
 			log.Info().Float64("kp", kp).Float64("kd", kd).Float64("ki", ki).Msg("Updated PID controller")
 		}
 
-		// Get the first trajectory point
-		trajectoryPoints := trajectory.GetPoints()
-		if len(trajectoryPoints) == 0 {
-			log.Warn().Msg("Received sensor data that had no trajectory points")
+		// Get the first horizontal scan
+		if len(horizontal_scans) == 0 {
+			log.Warn().Msg("Received sensor data that had no horizontal scans")
+			continue
+		}
+		resolution := imagingData.GetResolution()
+		if resolution == nil {
+			log.Warn().Msg("Received sensor data that had no resolution")
 			continue
 		}
 
-		steerValue := calculateSteerValue(pidController, trajectoryPoints, desiredTrajectoryPoint)
+		steerValue := calculateSteerValue(pidController, horizontal_scans, resolution)
 
 		err = sendOutput(actuatorOutput, speed, steerValue)
 
