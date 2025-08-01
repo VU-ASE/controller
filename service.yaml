@@ -23,10 +23,21 @@ configuration:
     type: number
     value: 0.4
     mutable: true
+#
+# The "secret sauce" of making the controller drive smoothly, is tuning the internal PID controller.
+# The values below are tested and work on most Rovers, but you can change them to your liking.
+# We recommend using roverctl-web to change the values on-the-fly, while the Rover is driving.
+#
+# Recommended approach:
+# 1. Start with all values at 0. Set kp to 0.1
+# 2. Is the Rover over-steering (zig-zagging?), slowly decrease kp, until it can *barely* make the turns
+# 3. Now if it is still wobbling, increase kd to make it "locked in" on its path
+# 4. For systematic errors, like always driving to the left, increase ki
+#
   - name: kp
     tunable: true
     type: number
-    value: 0.7
+    value: 0.3
   - name: kd
     tunable: true
     type: number
@@ -35,7 +46,3 @@ configuration:
     tunable: true
     type: number
     value: 0
-  - name: desired-trajectory-point
-    tunable: false
-    type: number
-    value: 0.0 
