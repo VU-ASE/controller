@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.0](https://github.com/VU-ASE/controller/compare/v1.6.0...v2.0.0) (2025-08-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* breaking change v2 controller
+
+### Features
+
+* added normalized desired trajectory and new PID values ([a94002b](https://github.com/VU-ASE/controller/commit/a94002bb9f78362c80a8abbeae79b8434aedc8ea))
+* breaking change v2 controller ([d0dc217](https://github.com/VU-ASE/controller/commit/d0dc217b1adea1d949ef1cc8075f2d4ba1029431))
+* make controller v2 work with imaging v2, tuned PID ([cb27310](https://github.com/VU-ASE/controller/commit/cb2731056951bb48c362ebe035c7f1b476eaefae))
+
 ## [1.6.0](https://github.com/VU-ASE/controller/compare/v1.5.0...v1.6.0) (2025-06-11)
 
 
